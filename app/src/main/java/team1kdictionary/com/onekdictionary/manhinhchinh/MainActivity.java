@@ -4,10 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.Menu;
@@ -99,25 +101,39 @@ public class MainActivity extends AppCompatActivity {
             searchView.setIconified(false);
             searchView.requestFocusFromTouch();
             searchView.setQuery(SPEECH_TO_TEXT, false);
-            TextView txtScore = myDialog.findViewById(R.id.txtScore);
-            String text = "";
-            for (String result : text_matched) {
-                text += result + " ";
+            tempList.clear();
+            for (int i = 0; i < itemsWordList.size(); i++) {
+                if (itemsWordList.get(i).getEng().startsWith(SPEECH_TO_TEXT)) {
+                    tempList.add(itemsWordList.get(i));
+//                            Toast.makeText(MainActivity.this, "Lưu thành công", Toast.LENGTH_SHORT).show();
+                }
             }
-//            txtScore.setText(text);
-            if (spaceCount(text) == 0 && text.contains(compareWord)) {
-                txtScore.setText("100% RẤT TỐT");
-            } else if (spaceCount(text) == 1 && text.contains(compareWord)) {
-                txtScore.setText("80% TỐT");
-            } else if (spaceCount(text) == 2 && text.contains(compareWord)) {
-                txtScore.setText("60% TẠM ỔN");
-            } else if (spaceCount(text) == 3 && text.contains(compareWord)) {
-                txtScore.setText("50% HÃY TẬP LUYỆN THÊM");
-            } else if (spaceCount(text) == 4 && text.contains(compareWord)) {
-                txtScore.setText("30% HÃY TẬP LUYỆN THÊM");
-            } else if (text.contains(compareWord) == false) {
-                txtScore.setText("HÃY TẬP XEM LẠI PHÁT ÂM");
+            MyCustomDialog.setWordForDialog(tempList, gvDic, MainActivity.this, myDialog);
+            if(SPEECH_TO_TEXT.compareTo(compareWord)==0)
+            {
+                Toast.makeText(MainActivity.this, "100% XUẤT SẮC", Toast.LENGTH_LONG).show();
             }
+//            TextView txtScore= myDialog.findViewById(R.id.txtScore);
+//            txtScore.setText(SPEECH_TO_TEXT);
+//            String score="";
+//            compareWord="beautiful";
+//            for(String result: text_matched)
+//            {
+//                score+=result+" ";
+//            }
+//            if (spaceCount(score) == 0 && score.contains(compareWord)) {
+//                Toast.makeText(MainActivity.this, "100% XUẤT SẮC", Toast.LENGTH_LONG).show();
+//            } else if (spaceCount(score) == 1 && score.contains(compareWord)) {
+//                Toast.makeText(MainActivity.this, "80% TỐT", Toast.LENGTH_LONG).show();
+//            } else if (spaceCount(score) == 2 && score.contains(compareWord)) {
+//                Toast.makeText(MainActivity.this, "60% TẠM ỔN", Toast.LENGTH_LONG).show();
+//            } else if (spaceCount(score) == 3 && score.contains(compareWord)) {
+//                Toast.makeText(MainActivity.this, "50% CẦN LUYỆN TẬP THÊM", Toast.LENGTH_LONG).show();
+//            } else if (spaceCount(score) == 4 && score.contains(compareWord)) {
+//                Toast.makeText(MainActivity.this, "40% HÃY XEM LẠI PHÁT ÂM", Toast.LENGTH_LONG).show();
+//            } else if (score.contains(compareWord) == false) {
+//                Toast.makeText(MainActivity.this, "CHƯA ĐẠT HÃY XEM LẠI PHÁT ÂM", Toast.LENGTH_LONG).show();
+//            }
 
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -156,7 +172,8 @@ public class MainActivity extends AppCompatActivity {
         allWordAdapter = new WordAdapter(MainActivity.this, R.layout.word_item, itemsWordList);
         gvDic.setAdapter(allWordAdapter);
 //        setWordForDialog(itemsWordList);
-        MyCustomDialog.setWordForDialog(itemsWordList, gvDic, MainActivity.this);
+        myDialog = new MyCustomDialog(MainActivity.this);
+        MyCustomDialog.setWordForDialog(itemsWordList, gvDic, MainActivity.this, myDialog);
 
     }
 
@@ -205,7 +222,13 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.mnvoice) {
-            startActivityForResult(speechIntent, RECOGNIZER_RESULT);
+            try {
+                startActivityForResult(speechIntent, RECOGNIZER_RESULT);
+            } catch (ActivityNotFoundException a) {
+                Toast.makeText(getApplicationContext(),
+                        "Cái điện thoại cùi bắp này không có hỗ trợ Google AI",
+                        Toast.LENGTH_SHORT).show();
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -231,6 +254,8 @@ public class MainActivity extends AppCompatActivity {
                     database = openOrCreateDatabase(DATABASE_NAME, MODE_PRIVATE, null);
                     database.execSQL("Update data SET history=? Where word=?", new String[]{"1", query});
                     tuDaTimKiem.add(query);
+
+                    tempList.clear();
                     for (int i = 0; i < itemsWordList.size(); i++) {
                         if (itemsWordList.get(i).getEng().startsWith(query)) {
                             tempList.add(itemsWordList.get(i));
@@ -238,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 //                    setWordForDialog(tempList);
-                    MyCustomDialog.setWordForDialog(tempList, gvDic, MainActivity.this);
+                    MyCustomDialog.setWordForDialog(tempList, gvDic, MainActivity.this, myDialog);
                 }
                 catch (Exception ex){
                     Log.e("LOI",ex.toString());
@@ -250,9 +275,9 @@ public class MainActivity extends AppCompatActivity {
             public boolean onQueryTextChange(String s) {
                 allWordAdapter.getFilter().filter(s);
                 if (s.compareTo("") == 0) {
-                    MyCustomDialog.setWordForDialog(itemsWordList, gvDic, MainActivity.this);
+                    MyCustomDialog.setWordForDialog(itemsWordList, gvDic, MainActivity.this, myDialog);
                 } else {
-                    MyCustomDialog.setWordForDialog(tempList, gvDic, MainActivity.this);
+                    MyCustomDialog.setWordForDialog(tempList, gvDic, MainActivity.this, myDialog);
                 }
                 return true;
             }
@@ -300,4 +325,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onPause() {
+        myDialog = new MyCustomDialog(MainActivity.this);
+        Toast.makeText(MainActivity.this, "On Pause", Toast.LENGTH_SHORT).show();
+        super.onPause();
+    }
 }

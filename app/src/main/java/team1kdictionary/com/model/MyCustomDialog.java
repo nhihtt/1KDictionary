@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -113,19 +114,18 @@ public class MyCustomDialog extends Dialog {
 
     }
 
-    public static void setWordForDialog(final List<Word> listItem, GridView gvDic, final Activity context) {
+    public static void setWordForDialog(final List<Word> listItem, GridView gvDic, final Activity context,
+                                        final Dialog myDialog) {
         gvDic.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-//                Intent intent = new Intent(context, MyCustomDialog.class);
-                final Dialog myDialog = new MyCustomDialog(context);
+                public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
                 myDialog.show();
                 // Set item selected
                 // itemsWWordList là List<Word> lưu toàn bộ từ trong database
                 // itemSelected là kiểu Word
                 itemSelected = listItem.get(position);
 
-                String word = itemSelected.getEng();
+                final String word = itemSelected.getEng();
                 String mean = itemSelected.getMeaning();
 
                 TextView tvWord = myDialog.findViewById(R.id.tvWord);
@@ -139,14 +139,20 @@ public class MyCustomDialog extends Dialog {
                 btnSpeechToText.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-//                        myDialog.dismiss();
-//                        Dialog newDialog = new FolderCustomDialog(context);
-//                        newDialog.show();
                         context.startActivityForResult(MainActivity.speechIntent, MainActivity.RECOGNIZER_RESULT);
                     }
                 });
             }
         });
+    }
 
+    private static int spaceCount(String str) {
+        int spaceCount = 0;
+        for (char c : str.toCharArray()) {
+            if (c == ' ') {
+                spaceCount++;
+            }
+        }
+        return spaceCount;
     }
 }
