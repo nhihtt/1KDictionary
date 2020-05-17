@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +31,7 @@ import team1kdictionary.com.model.WordFolder;
 import team1kdictionary.com.onekdictionary.R;
 import team1kdictionary.com.onekdictionary.databinding.ActivityFavoriteBinding;
 import team1kdictionary.com.onekdictionary.luyentap.FlashCardActivity;
+import team1kdictionary.com.onekdictionary.luyentap.LuyenTapActivity;
 import team1kdictionary.com.onekdictionary.manhinhchinh.HistoryActivity;
 import team1kdictionary.com.onekdictionary.manhinhchinh.MainActivity;
 import team1kdictionary.com.onekdictionary.manhinhchinh.SettingActivity;
@@ -63,6 +65,23 @@ public class FavoriteActivity extends AppCompatActivity {
                 WordFolder folder = folderAdapter.getItem(position);
                 selectedFolder = folder;
                 binding.txtNowStudyingName.setText(selectedFolder.getName());
+            }
+        });
+        binding.btnViewFlashCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+               Intent intent= new Intent(FavoriteActivity.this,FlashCardActivity.class);
+               intent.putExtra("FolderName",binding.txtNowStudyingName.getText().toString());
+               startActivity(intent);
+            }
+        });
+        binding.btnQuizGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(FavoriteActivity.this, LuyenTapActivity.class);
+                intent.putExtra("FolderName",binding.txtNowStudyingName.getText().toString());
+                startActivity(intent);
             }
         });
 
@@ -186,11 +205,7 @@ public class FavoriteActivity extends AppCompatActivity {
     }
 
 
-    public void moManHinhFlashCard(View view) {
-        Intent intent=new Intent(FavoriteActivity.this, FlashCardActivity.class);
-        startActivity(intent);
-    }
 
-    public void moManHinhLuyenTap(View view) {
-    }
+
+
 }

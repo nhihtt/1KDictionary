@@ -8,13 +8,23 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 import team1kdictionary.com.onekdictionary.R;
+import team1kdictionary.com.onekdictionary.databinding.ActivityLuyenTapBinding;
 
 public class LuyenTapActivity extends AppCompatActivity {
+ActivityLuyenTapBinding binding;
+String value;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_luyen_tap);
+        binding=ActivityLuyenTapBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        layDuLieu();
+        addEvents();
+
+    }
+
+    private void addEvents() {
         Button btnStarQuiz=findViewById(R.id.btnStartQuiz);
         btnStarQuiz.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -26,7 +36,13 @@ public class LuyenTapActivity extends AppCompatActivity {
 
     private void startQuiz() {
         Intent intent= new Intent(LuyenTapActivity.this,QuizActivity.class);
+        intent.putExtra("FolderName",value);
         startActivity(intent);
+    }
+    private void layDuLieu() {
+        Intent intent= getIntent();
+        value = intent.getStringExtra("FolderName");
+        binding.txtQuizName.setText(value+" Quiz");
     }
 
 }

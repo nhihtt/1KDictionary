@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".luyentap.KetQuaActivity"
+    android:orientation="vertical"
+    android:background="@color/colorGray">
+    <TextView
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:textSize="25dp"
+        android:layout_marginBottom="20dp"
+        android:textColor="@color/black"
+        android:layout_marginLeft="15dp"
+        android:text="Bạn đã hoàn thành bài Quiz !!!"
+        />
+    <TextView
+        android:id="@+id/txtScore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Your Score: "
+        android:textSize="20dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginBottom="30dp"
+        android:textColor="@color/black"
+        />
+    <Button
+        android:id="@+id/btnVeTrangChu"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:background="@drawable/shapebutton"
+        android:text="Về trang chủ"
+        />
+
+</LinearLayout>

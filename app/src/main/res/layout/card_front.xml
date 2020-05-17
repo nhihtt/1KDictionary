@@ -15,11 +15,5 @@
         android:paddingBottom="15dp"
         android:src="@drawable/flashcad"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="front"
-        android:textColor="@color/black"
-        style="@style/Base.TextAppearance.AppCompat.Display1"
-        android:gravity="center"/>
+
 </FrameLayout>

@@ -52,7 +52,7 @@
                     android:text="Xem" />
 
                 <Button
-                    android:onClick="moManHinhFlashCard"
+
                     android:id="@+id/btnViewFlashCard"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
                     android:text="flashcard" />
 
                 <Button
-                    android:onClick="moManHinhLuyenTap"
+
                     android:id="@+id/btnQuizGame"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

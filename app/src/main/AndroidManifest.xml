@@ -9,10 +9,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".hienthitu.HienThiTuActivity"></activity>
+        <activity android:name=".luyentap.KetQuaActivity"></activity>
+        <activity android:name=".hienthitu.HienThiTuActivity" />
         <activity android:name=".manhinhchinh.SettingActivity" />
         <activity android:name=".manhinhchinh.HistoryActivity" />
         <activity android:name=".manhinhchinh.FavoriteActivity" />
+        <activity android:name=".luyentap.FlashCardActivity" />
+        <activity android:name=".luyentap.LuyenTapActivity" />
+        <activity android:name=".luyentap.QuizActivity" />
         <activity android:name=".manhinhchinh.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

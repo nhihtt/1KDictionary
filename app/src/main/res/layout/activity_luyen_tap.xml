@@ -8,14 +8,16 @@
     android:padding="16dp"
     android:background="#fff9c4"
     >
+
     <TextView
+        android:id="@+id/txtQuizName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
         android:text="Your Quiz"
         android:textColor="@color/black"
-        android:textSize="35sp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"/>
+        android:textSize="35sp" />
     <TextView
         android:id="@+id/txtHighScore"
         android:layout_width="wrap_content"

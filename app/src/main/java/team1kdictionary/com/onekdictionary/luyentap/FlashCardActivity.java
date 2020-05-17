@@ -2,30 +2,91 @@ package team1kdictionary.com.onekdictionary.luyentap;
 
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import team1kdictionary.com.model.Word;
 import team1kdictionary.com.onekdictionary.R;
+import team1kdictionary.com.onekdictionary.databinding.ActivityFlashCardBinding;
 
 public class FlashCardActivity extends AppCompatActivity {
+    ActivityFlashCardBinding binding;
     private AnimatorSet mSetRightOut;
     private AnimatorSet mSetLeftIn;
     private boolean mIsBackVisible = false;
     private View mCardFrontLayout;
     private View mCardBackLayout;
+    private  ArrayList<Word> listWordStudying = new ArrayList<>();
+    SQLiteDatabase database=null;
+    String DATABASE_NAME="TuDienAnhviet.sqlite";
+    String DB_PATH_SUFFIX="/databases/";
+    Integer soTu;
+    Integer viTriTuHienTai=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_flash_card);
+        binding=ActivityFlashCardBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        layDuLieu();
         addControls();
+        hienThiDuLieu();
+        addEvents();
     }
-    private void addControls() {
 
+    private void hienThiDuLieu() {
+        binding.txtSoTu.setText(viTriTuHienTai+1+"/"+soTu);
+        binding.txtFront.setText(listWordStudying.get(viTriTuHienTai).getEng());
+        binding.txtBack.setText(listWordStudying.get(viTriTuHienTai).getMeaning());
+    }
+
+    private void layDuLieu() {
+        Intent intent= getIntent();
+        String value = intent.getStringExtra("FolderName");
+        binding.txtFolder.setText(value);
+    }
+
+    private void addEvents() {
+        binding.btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viTriTuHienTai=viTriTuHienTai+1;
+                if(viTriTuHienTai<soTu) {
+                   hienThiDuLieu();
+                }
+                else {
+                    viTriTuHienTai=0;
+                   hienThiDuLieu();
+                }
+            }
+        });
+        binding.btnPrevious.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viTriTuHienTai=viTriTuHienTai-1;
+                if(viTriTuHienTai>=0) {
+                  hienThiDuLieu();
+                }
+                else {
+                    viTriTuHienTai=soTu-1;
+                   hienThiDuLieu();
+                }
+            }
+        });
+    }
+
+    private void addControls() {
         findViews();
         loadAnimations();
         changeCameraDistance();
+        addWords();
     }
 
     private void changeCameraDistance() {
@@ -59,5 +120,33 @@ public class FlashCardActivity extends AppCompatActivity {
             mSetLeftIn.start();
             mIsBackVisible = false;
         }
+    }
+    private void addWords() {
+        listWordStudying.clear();
+        //database = openOrCreateDatabase(DATABASE_NAME, MODE_PRIVATE, null);
+       /* Cursor c = database.rawQuery("Select * From data Where foldername = ...", null);
+        while (c.moveToNext()) {
+            int id=c.getInt(0);
+            String word = c.getString(1);
+            String mean = c.getString(2);
+
+            Word vocabulary = new Word(word, null, null, mean,null);
+            listWordStudying.add(vocabulary);
+//           allWordAdapter.add(vocabulary);
+        }
+
+        c.close();*/
+
+       //data mẫu
+        Word voca1 = new Word("father", null, null, "bố",null);
+        listWordStudying.add(voca1);
+        Word voca2 = new Word("mother", null, null, "mẹ",null);
+        listWordStudying.add(voca2);
+        Word voca3 = new Word("history", null, null, "lịch sử",null);
+        listWordStudying.add(voca3);
+        Word voca4 = new Word("question", null, null, "câu hỏi",null);
+        soTu=listWordStudying.size()+1;
+        listWordStudying.add(voca4);
+
     }
 }

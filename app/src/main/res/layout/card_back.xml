@@ -16,11 +16,5 @@
         android:src="@drawable/flashcad"
         android:tint="@color/cardBack" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="back"
-        android:textColor="@color/black"
-        style="@style/Base.TextAppearance.AppCompat.Display1"
-        android:gravity="center"/>
+
 </FrameLayout>
