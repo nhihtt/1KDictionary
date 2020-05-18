@@ -5,7 +5,6 @@ import adapter.WordAdapter;
 public class WordFolder {
     private String id;
     private String name;
-    private WordAdapter adpaterWordOfFolder;
 
 
 
@@ -20,10 +19,10 @@ public class WordFolder {
     public WordFolder() {
     }
 
-    public WordFolder(String id, String name, WordAdapter adpaterWordOfFolder) {
+    public WordFolder(String id, String name) {
         this.id = id;
         this.name = name;
-        this.adpaterWordOfFolder = adpaterWordOfFolder;
+
     }
 
     public String getName() {
@@ -34,11 +33,5 @@ public class WordFolder {
         this.name = name;
     }
 
-    public WordAdapter getAdpaterWordOfFolder() {
-        return adpaterWordOfFolder;
-    }
 
-    public void setAdpaterWordOfFolder(WordAdapter adpaterWordOfFolder) {
-        this.adpaterWordOfFolder = adpaterWordOfFolder;
-    }
 }

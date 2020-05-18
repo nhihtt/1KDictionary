@@ -6,7 +6,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +24,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -38,10 +42,12 @@ import team1kdictionary.com.onekdictionary.manhinhchinh.SettingActivity;
 
 public class FavoriteActivity extends AppCompatActivity {
 
-    WordAdapter favoriteWordAdapter;
-    WordFolder favoriteFolder = new WordFolder("fd0", "Favorite", favoriteWordAdapter);
+    String DATABASE="TuDienAnhviet.sqlite";
+    String DB_PATH_SUFFIX="/databases/";
+    String newID;
+    String newName;
+    SQLiteDatabase database=null;
     FolderAdapter folderAdapter;
-    FolderAdapter nowStudyAdapter;
     WordFolder selectedFolder;
     ActivityFavoriteBinding binding;
 
@@ -52,9 +58,12 @@ public class FavoriteActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         changeActivity();
         addControls();
+        displayFolderList();
         addEvents();
 
+
         }
+
 
 
 
@@ -70,18 +79,23 @@ public class FavoriteActivity extends AppCompatActivity {
         binding.btnViewFlashCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-               Intent intent= new Intent(FavoriteActivity.this,FlashCardActivity.class);
-               intent.putExtra("FolderName",binding.txtNowStudyingName.getText().toString());
-               startActivity(intent);
+            if(selectedFolder!=null) {
+                Intent intent = new Intent(FavoriteActivity.this, FlashCardActivity.class);
+                intent.putExtra("FID", selectedFolder.getId());
+                intent.putExtra("FolderName", binding.txtNowStudyingName.getText().toString());
+                startActivity(intent);
             }
+           }
         });
         binding.btnQuizGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(FavoriteActivity.this, LuyenTapActivity.class);
-                intent.putExtra("FolderName",binding.txtNowStudyingName.getText().toString());
-                startActivity(intent);
+                if (selectedFolder != null) {
+                    Intent intent = new Intent(FavoriteActivity.this, LuyenTapActivity.class);
+                    intent.putExtra("FID", selectedFolder.getId());
+                    intent.putExtra("FolderName", binding.txtNowStudyingName.getText().toString());
+                    startActivity(intent);
+                }
             }
         });
 
@@ -94,16 +108,12 @@ public class FavoriteActivity extends AppCompatActivity {
         //khởi tạo adapter
         folderAdapter = new FolderAdapter(FavoriteActivity.this, R.layout.folder_item);
         //gán adapter cho listview
-        createDefault();
         binding.lvWordFile.setAdapter(folderAdapter);
 
      //   nowStudyAdapter=new FolderAdapter(FavoriteActivity.this, R.layout.word_folder_item);
       //  binding.lvNowStudy.setAdapter(nowStudyAdapter);
     }
 
-    private void createDefault() {
-        folderAdapter.add(favoriteFolder);
-    }
 
     private void changeActivity() {
         //Set Home Selected
@@ -146,8 +156,16 @@ public class FavoriteActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    public void themFolder(MenuItem item) {
-        WordFolder folder = new WordFolder();
+    private void displayFolderList() {
+        database = openOrCreateDatabase(DATABASE, MODE_PRIVATE, null);
+        Cursor c = database.rawQuery("Select * From folder", null);
+        while (c.moveToNext()) {
+            String id=c.getString(0);
+            String name = c.getString(1);
+            WordFolder folder = new WordFolder(id,name);
+            folderAdapter.add(folder);
+        }
+        c.close();
     }
 
     @Override
@@ -165,12 +183,7 @@ public class FavoriteActivity extends AppCompatActivity {
     }
 
 
-    private void xoaFolder() {
 
-        if (selectedFolder != null) {
-            folderAdapter.remove(selectedFolder);
-        }
-    }
 
 
     private void hienThiTaoFolder() {
@@ -183,15 +196,17 @@ public class FavoriteActivity extends AppCompatActivity {
         btnCreateNewFolder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String newID = "fd" + (folderAdapter.getCount());
+                newID = "fd" + (folderAdapter.getCount());
+                newName=edtNewFolderName.getText().toString();
                 WordFolder newFolder = new WordFolder();
                 WordAdapter newWordAdapter = new WordAdapter();
-                newFolder.setName(edtNewFolderName.getText().toString());
-                newFolder.setAdpaterWordOfFolder(newWordAdapter);
+                newFolder.setName(newName);
                 newFolder.setId(newID);
-                folderAdapter.add(newFolder);
+                if(addFolder()!=0) {
+                    folderAdapter.add(newFolder);
+                    Toast.makeText(FavoriteActivity.this, "Tạo folder thành công", Toast.LENGTH_LONG).show();
+                }
                 dialog.dismiss();
-
             }
 
         });
@@ -204,7 +219,49 @@ public class FavoriteActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    private int addFolder() {
+        ContentValues values=new ContentValues();
+        values.put("id",newID);
+        values.put("name",newName);
+        int result= (int) database.insert("folder",null,values);
+        return result;
+    }
 
+
+    private void xoaFolder() {
+
+        if (selectedFolder != null) {
+            if(deleteFolder()!=0) {
+                Toast.makeText(FavoriteActivity.this,"Xóa folder thành công", Toast.LENGTH_LONG).show();
+                folderAdapter.remove(selectedFolder);
+                capNhatID();
+            }
+        }
+    }
+
+    private int deleteFolder() {
+        String id=selectedFolder.getId();
+        int result=database.delete("folder","id=?",new String[] {id});
+        database.delete("relationships","FID=?",new String[]{id});
+        return result;
+    }
+
+    public void capNhatID()
+    {
+        if(folderAdapter.getCount()!=0)
+        {
+            for(int i=0;i<folderAdapter.getCount();i++)
+            {
+                selectedFolder=folderAdapter.getItem(i);
+                ContentValues contentValues=new ContentValues();
+                newID="fd"+i;
+                contentValues.put("id",newID);
+                if(database.update("folder",contentValues,"id=?",new String[]{selectedFolder.getId()})!=0) {
+                    selectedFolder.setId("fd" + i);
+                }
+            }
+        }
+    }
 
 
 

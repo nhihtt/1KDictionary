@@ -2,7 +2,11 @@ package team1kdictionary.com.model;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
@@ -11,18 +15,22 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import adapter.Relationship;
 import team1kdictionary.com.onekdictionary.R;
 import team1kdictionary.com.onekdictionary.manhinhchinh.MainActivity;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
 import static team1kdictionary.com.onekdictionary.manhinhchinh.MainActivity.itemSelected;
 
 public class MyCustomDialog extends Dialog {
@@ -30,15 +38,21 @@ public class MyCustomDialog extends Dialog {
     TextView tvWord, tvInfo, txtClose;
     Button btnSpeechToText;
     GridView gvDic;
-
+    static int WID;
     TextToSpeech textToSpeech;
     Integer dem = 0;
-
+    ArrayList<String>selectedFoldersID=new ArrayList<>();
     int RECOGNIZER_RESULT = 1;
     String SPEECH_TO_TEXT = "";
     Intent speechIntent;
-
+    ArrayList<WordFolder> lstFolder=new ArrayList<>();
+    String DATABASE="TuDienAnhviet.sqlite";
+    //    String DATABASE_NAME="Folder.sqlite";
+    String DB_PATH_SUFFIX="/databases/";
+    SQLiteDatabase database=null;
+    String[] str;
     Activity context;
+    Relationship rls;
 
     public MyCustomDialog(@NonNull Activity context) {
         super(context);
@@ -46,6 +60,8 @@ public class MyCustomDialog extends Dialog {
         setContentView(R.layout.custom_dialog);
         addControls();
         addEvents();
+        displayFolderList();
+
     }
 
     private void addEvents() {
@@ -82,12 +98,12 @@ public class MyCustomDialog extends Dialog {
         imgFolder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Dialog folderDialog = new FolderCustomDialog(context);
-                folderDialog.show();
+                //   Dialog folderDialog = new FolderCustomDialog(context);
+                //  folderDialog.show();
+                hienThiThemVaoFolder();
+
             }
         });
-
-
     }
 
     private void addControls() {
@@ -110,7 +126,55 @@ public class MyCustomDialog extends Dialog {
                 }
             }
         });
-
+    }
+    int result;
+    private void hienThiThemVaoFolder() {
+        AlertDialog.Builder b = new AlertDialog.Builder(context);
+        b.setTitle("Chọn Folder:");
+        b.setMultiChoiceItems(str, null,new DialogInterface.OnMultiChoiceClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                //Nếu người dùng chọn
+                if (isChecked) {
+                    //Thêm người dùng người dùng chọn vào ArrayList
+                    selectedFoldersID.add("fd"+which);
+                }
+            }
+        });
+        b.setPositiveButton("OK", new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String wid=WID+"";
+                database.delete("relationships","WID=?",new String[]{wid});
+                if(selectedFoldersID.size()!=0)
+                {
+                    for (int i=0;i<selectedFoldersID.size();i++) {
+                        ContentValues values = new ContentValues();
+                        values.put("WID", wid);
+                        values.put("FID",selectedFoldersID.get(i));
+                        database.insert("relationships",null,values);
+                    }
+                }
+            }
+        });
+        b.show();
+    }
+    private void displayFolderList() {
+        //  folderAdapter.clear();
+        database = context.openOrCreateDatabase(DATABASE, MODE_PRIVATE, null);
+        Cursor c = database.rawQuery("Select * From folder", null);
+        while (c.moveToNext()) {
+            String id=c.getString(0);
+            String name = c.getString(1);
+            WordFolder folder = new WordFolder(id,name);
+            lstFolder.add(folder);
+        }
+        c.close();
+        str=new String[lstFolder.size()];
+        for(int i=0; i<lstFolder.size();i++)
+        {
+            str[i]=lstFolder.get(i).getName();
+        }
     }
 
     public static void setWordForDialog(final List<Word> listItem, GridView gvDic, final Activity context) {
@@ -124,7 +188,7 @@ public class MyCustomDialog extends Dialog {
                 // itemsWWordList là List<Word> lưu toàn bộ từ trong database
                 // itemSelected là kiểu Word
                 itemSelected = listItem.get(position);
-
+                WID=itemSelected.getIdword();
                 String word = itemSelected.getEng();
                 String mean = itemSelected.getMeaning();
 

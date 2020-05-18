@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
             searchView.setIconified(false);
             searchView.requestFocusFromTouch();
             searchView.setQuery(SPEECH_TO_TEXT, false);
-            TextView txtScore = myDialog.findViewById(R.id.txtScore);
+/*            TextView txtScore = myDialog.findViewById(R.id.txtResult);
             String text = "";
             for (String result : text_matched) {
                 text += result + " ";
@@ -117,8 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 txtScore.setText("30% HÃY TẬP LUYỆN THÊM");
             } else if (text.contains(compareWord) == false) {
                 txtScore.setText("HÃY TẬP XEM LẠI PHÁT ÂM");
-            }
-
+            }*/
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -138,10 +137,11 @@ public class MainActivity extends AppCompatActivity {
         database = openOrCreateDatabase(DATABASE_NAME, MODE_PRIVATE, null);
         Cursor c = database.rawQuery("Select * From data Where _id > 56", null);
         while (c.moveToNext()) {
+            int id=c.getInt(0);
             String word = c.getString(1);
             String mean = c.getString(2);
 
-            Word vocabulary = new Word(word, null, null, mean, null);
+            Word vocabulary = new Word(id,word, null, null, mean, null);
             itemsWordList.add(vocabulary);
 //           allWordAdapter.add(vocabulary);
 

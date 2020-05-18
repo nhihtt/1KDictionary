@@ -12,7 +12,8 @@ import team1kdictionary.com.onekdictionary.databinding.ActivityLuyenTapBinding;
 
 public class LuyenTapActivity extends AppCompatActivity {
 ActivityLuyenTapBinding binding;
-String value;
+String FID;
+String folderName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,13 +37,15 @@ String value;
 
     private void startQuiz() {
         Intent intent= new Intent(LuyenTapActivity.this,QuizActivity.class);
-        intent.putExtra("FolderName",value);
+        intent.putExtra("FID",FID);
+        intent.putExtra("FolderName",folderName);
         startActivity(intent);
     }
     private void layDuLieu() {
         Intent intent= getIntent();
-        value = intent.getStringExtra("FolderName");
-        binding.txtQuizName.setText(value+" Quiz");
+        FID = intent.getStringExtra("FID");
+        folderName=intent.getStringExtra("FolderName");
+        binding.txtQuizName.setText(folderName+" Quiz");
     }
 
 }

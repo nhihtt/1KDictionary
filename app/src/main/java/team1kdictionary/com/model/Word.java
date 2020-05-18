@@ -13,6 +13,9 @@ public class Word {
     private int isFavorite;
     private String history;
 
+    public Word() {
+    }
+
     public Integer getIdword() {
         return idword;
     }
@@ -29,7 +32,8 @@ public class Word {
         this.history = history;
     }
 
-    public Word(String eng, String pronounce, String type, String meaning, String history) {
+    public Word(int id,String eng, String pronounce, String type, String meaning, String history) {
+        this.idword=id;
         this.eng = eng;
         this.pronounce = pronounce;
         this.type = type;

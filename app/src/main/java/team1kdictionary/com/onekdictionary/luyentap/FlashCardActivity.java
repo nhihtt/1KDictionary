@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import team1kdictionary.com.model.Word;
 import team1kdictionary.com.onekdictionary.R;
 import team1kdictionary.com.onekdictionary.databinding.ActivityFlashCardBinding;
+import team1kdictionary.com.onekdictionary.manhinhchinh.FavoriteActivity;
 
 public class FlashCardActivity extends AppCompatActivity {
     ActivityFlashCardBinding binding;
@@ -29,6 +31,9 @@ public class FlashCardActivity extends AppCompatActivity {
     String DATABASE_NAME="TuDienAnhviet.sqlite";
     String DB_PATH_SUFFIX="/databases/";
     Integer soTu;
+    String FID;
+    ArrayList<String> listWID=new ArrayList<>();
+    ArrayList<Word> a=new ArrayList<>();
     Integer viTriTuHienTai=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,15 +47,18 @@ public class FlashCardActivity extends AppCompatActivity {
     }
 
     private void hienThiDuLieu() {
-        binding.txtSoTu.setText(viTriTuHienTai+1+"/"+soTu);
+        if(listWordStudying.size()!=0){
+            binding.txtSoTu.setText(viTriTuHienTai+1+"/"+soTu);
         binding.txtFront.setText(listWordStudying.get(viTriTuHienTai).getEng());
         binding.txtBack.setText(listWordStudying.get(viTriTuHienTai).getMeaning());
+        }
     }
 
     private void layDuLieu() {
         Intent intent= getIntent();
-        String value = intent.getStringExtra("FolderName");
-        binding.txtFolder.setText(value);
+        FID = intent.getStringExtra("FID");
+        String folderName=intent.getStringExtra("FolderName");
+        binding.txtFolder.setText(folderName);
     }
 
     private void addEvents() {
@@ -84,10 +92,15 @@ public class FlashCardActivity extends AppCompatActivity {
 
     private void addControls() {
         findViews();
+        timTuTrongFolder();
+        addWords();
         loadAnimations();
         changeCameraDistance();
-        addWords();
+
+
     }
+
+
 
     private void changeCameraDistance() {
         int distance = 1000;
@@ -121,10 +134,10 @@ public class FlashCardActivity extends AppCompatActivity {
             mIsBackVisible = false;
         }
     }
-    private void addWords() {
+   private void addWords() {
         listWordStudying.clear();
-        //database = openOrCreateDatabase(DATABASE_NAME, MODE_PRIVATE, null);
-       /* Cursor c = database.rawQuery("Select * From data Where foldername = ...", null);
+ /*       database = openOrCreateDatabase(DATABASE_NAME, MODE_PRIVATE, null);
+        Cursor c = database.rawQuery("Select * From folder Where foldername = ...", null);
         while (c.moveToNext()) {
             int id=c.getInt(0);
             String word = c.getString(1);
@@ -135,7 +148,7 @@ public class FlashCardActivity extends AppCompatActivity {
 //           allWordAdapter.add(vocabulary);
         }
 
-        c.close();*/
+        c.close();
 
        //data mẫu
         Word voca1 = new Word("father", null, null, "bố",null);
@@ -146,7 +159,48 @@ public class FlashCardActivity extends AppCompatActivity {
         listWordStudying.add(voca3);
         Word voca4 = new Word("question", null, null, "câu hỏi",null);
         soTu=listWordStudying.size()+1;
-        listWordStudying.add(voca4);
+        listWordStudying.add(voca4);*/
+    for(int i=0;i<a.size();i++)
+    {
+        if(i==a.size()-1)
+        {
+            soTu=listWordStudying.size()+1;
+        }
+        listWordStudying.add(a.get(i));
+    }
 
     }
+   private void timTuTrongFolder() {
+       soTu=listWordStudying.size()+1;
+        database = openOrCreateDatabase(DATABASE_NAME, MODE_PRIVATE, null);
+        String query="Select * From relationships Where FID = '"+FID+"'";
+        Cursor c = database.rawQuery(query, null);
+        while (c.moveToNext()) {
+            String WID=c.getString(0);
+            listWID.add(WID);
+        }
+        c.close();
+
+        for(int i=0;i<listWID.size();i++)
+        {
+            int id=Integer.parseInt(listWID.get(i));
+            query="Select * From data Where _id = "+id;
+            c=database.rawQuery(query, null);
+            while (c.moveToNext()) {
+                Word w = new Word();
+                w.setIdword(c.getInt(0));
+                w.setEng(c.getString(1));
+                w.setMeaning(c.getString(2));
+
+                a.add(w);
+            }
+            c.close();
+        }
+        if(listWordStudying.size()!=0)
+        {
+            Toast.makeText(FlashCardActivity.this,"Thành công", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
 }

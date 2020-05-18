@@ -1,9 +1,11 @@
 package team1kdictionary.com.onekdictionary.luyentap;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,14 +16,18 @@ import team1kdictionary.com.onekdictionary.R;
 import team1kdictionary.com.onekdictionary.databinding.ActivityQuizBinding;
 
 public class QuizActivity extends AppCompatActivity {
-ActivityQuizBinding binding;
+    ActivityQuizBinding binding;
     private ArrayList<Word> listWordStudying = new ArrayList<>();
     SQLiteDatabase database=null;
     String DATABASE_NAME="TuDienAnhviet.sqlite";
     String DB_PATH_SUFFIX="/databases/";
     Integer soTu;
     Integer viTriTuHienTai=0;
+    String FID;
+    String folderName;
     String value;
+    ArrayList<String> listWID=new ArrayList<>();
+    ArrayList<Word> temp=new ArrayList<>();
     Integer score=0;
     Integer diemMoiCau=0;
     @Override
@@ -30,6 +36,8 @@ ActivityQuizBinding binding;
         binding=ActivityQuizBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         layDuLieu();
+      //  addWords();
+        timTuTrongFolder();
         addWords();
         hienThiDuLieu();
         addEvents();
@@ -79,8 +87,40 @@ ActivityQuizBinding binding;
 
     private void layDuLieu() {
         Intent intent= getIntent();
-        value = intent.getStringExtra("FolderName");
+        FID = intent.getStringExtra("FID");
+        folderName=intent.getStringExtra("FolderName");
         binding.txtFolderName.setText(value);
+    }
+    private void timTuTrongFolder() {
+        soTu=listWordStudying.size()+1;
+        database = openOrCreateDatabase(DATABASE_NAME, MODE_PRIVATE, null);
+        String query="Select * From relationships Where FID = '"+FID+"'";
+        Cursor c = database.rawQuery(query, null);
+        while (c.moveToNext()) {
+            String WID=c.getString(0);
+            listWID.add(WID);
+        }
+        c.close();
+
+        for(int i=0;i<listWID.size();i++)
+        {
+            int id=Integer.parseInt(listWID.get(i));
+            query="Select * From data Where _id = "+id;
+            c=database.rawQuery(query, null);
+            while (c.moveToNext()) {
+                Word w = new Word();
+                w.setIdword(c.getInt(0));
+                w.setEng(c.getString(1));
+                w.setMeaning(c.getString(2));
+                temp.add(w);
+            }
+            c.close();
+        }
+        if(listWordStudying.size()!=0)
+        {
+            Toast.makeText(QuizActivity.this,"Thành công", Toast.LENGTH_LONG).show();
+        }
+
     }
     private void addWords() {
         listWordStudying.clear();
@@ -96,7 +136,7 @@ ActivityQuizBinding binding;
 //           allWordAdapter.add(vocabulary);
         }
 
-        c.close();*/
+        c.close();
 
         //data mẫu
         Word voca1 = new Word("father", null, null, "bố", null);
@@ -108,6 +148,14 @@ ActivityQuizBinding binding;
         Word voca4 = new Word("question", null, null, "câu hỏi", null);
         soTu = listWordStudying.size() + 1;
         diemMoiCau=100/soTu;
-        listWordStudying.add(voca4);
+        listWordStudying.add(voca4);*/
+        for(int i=0;i<temp.size();i++)
+        {
+            if(i==temp.size()-1)
+            {
+                soTu=listWordStudying.size()+1;
+            }
+            listWordStudying.add(temp.get(i));
+        }
     }
 }

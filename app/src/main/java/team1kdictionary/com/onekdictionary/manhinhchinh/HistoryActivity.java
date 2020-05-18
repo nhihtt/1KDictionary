@@ -90,7 +90,7 @@ public class HistoryActivity extends AppCompatActivity {
             String word = c.getString(1);
             String mean = c.getString(2);
 
-                Word vocabulary = new Word(word, null, null, mean,null);
+                Word vocabulary = new Word(id,word, null, null,mean,null);
                 itemsWordListHistory.add(vocabulary);
 //           allWordAdapter.add(vocabulary);
 
