@@ -139,7 +139,7 @@ public class MyCustomDialog extends Dialog {
                 btnSpeechToText.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        context.startActivityForResult(MainActivity.speechIntent, MainActivity.RECOGNIZER_RESULT);
+                        context.startActivityForResult(MainActivity.speechIntent, 113);
                     }
                 });
             }

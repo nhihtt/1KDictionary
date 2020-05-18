@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.GridView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -22,14 +23,16 @@ import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import team1kdictionary.com.model.Http;
 import team1kdictionary.com.model.MyCustomDialog;
 import team1kdictionary.com.model.Word;
 import adapter.WordAdapter;
@@ -74,11 +77,52 @@ public class MainActivity extends AppCompatActivity {
         try {
             displayWordList();
             voiceRecognization();
+//            translateParagraph();
             checkPronounce();
+//            googleTextTranslate();
         } catch (Exception ex) {
             Toast.makeText(this, "Error " + ex.toString(), Toast.LENGTH_LONG).show();
         }
     }
+
+//    private void translateParagraph() {
+//        binding.btnTranslate.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String translationString = binding.edtParagraph.getText().toString();
+//                try {
+//                    Http.post(translationString, "en", "es", new JsonHttpResponseHandler()
+//                    {
+//                        @Override
+//                        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
+//                            try {
+//                                JSONObject serverResp = new JSONObject(response.toString());
+//                                JSONObject jsonObject = serverResp.getJSONObject("data");
+//                                JSONArray transObject = jsonObject.getJSONArray("translations");
+//                                JSONObject transObject2 =  transObject.getJSONObject(0);
+//                                binding.edtResult.setText(transObject2.getString("translatedText"));
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//                        };
+//                    });
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//    }
+
+
+//    private void googleTextTranslate() {
+//        FirebaseTranslatorOptions options =
+//                new FirebaseTranslatorOptions.Builder()
+//                        .setSourceLanguage(FirebaseTranslateLanguage.EN)
+//                        .setTargetLanguage(FirebaseTranslateLanguage.VI)
+//                        .build();
+//        final FirebaseTranslator englishVietNamTranslator =
+//                FirebaseNaturalLanguage.getInstance().getTranslator(options);
+//    }
 
     private void checkPronounce() {
 
@@ -90,6 +134,8 @@ public class MainActivity extends AppCompatActivity {
         speechIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Đang lắng nghe...");
         speechIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
     }
+
+
 
 
     @Override
@@ -109,32 +155,54 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             MyCustomDialog.setWordForDialog(tempList, gvDic, MainActivity.this, myDialog);
-            if(SPEECH_TO_TEXT.compareTo(compareWord)==0)
+//            Toast.makeText(MainActivity.this, "Word: "+compareWord, Toast.LENGTH_LONG).show();
+//            if(text_matched.contains(compareWord))
+//            {
+//                Toast.makeText(MainActivity.this, "100% XUẤT SẮC", Toast.LENGTH_LONG).show();
+//            }
+
+
+        }
+        if (requestCode == 113 && resultCode == RESULT_OK && data != null)
+        {
+            for (int i = 0; i < itemsWordList.size(); i++) {
+                if (itemsWordList.get(i).getEng().startsWith(SPEECH_TO_TEXT)) {
+                    tempList.add(itemsWordList.get(i));
+//                            Toast.makeText(MainActivity.this, "Lưu thành công", Toast.LENGTH_SHORT).show();
+                }
+            }
+            MyCustomDialog.setWordForDialog(tempList, gvDic, MainActivity.this, myDialog);
+
+            text_matched = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            List<String> text_result = new ArrayList<>();
+            for(int i=0; i<text_matched.size();i++)
+            {
+                text_result.add(text_matched.get(i).toLowerCase());
+            }
+            if(text_result.contains(compareWord) && text_result.size()==1)
             {
                 Toast.makeText(MainActivity.this, "100% XUẤT SẮC", Toast.LENGTH_LONG).show();
             }
-//            TextView txtScore= myDialog.findViewById(R.id.txtScore);
-//            txtScore.setText(SPEECH_TO_TEXT);
-//            String score="";
-//            compareWord="beautiful";
-//            for(String result: text_matched)
-//            {
-//                score+=result+" ";
-//            }
-//            if (spaceCount(score) == 0 && score.contains(compareWord)) {
-//                Toast.makeText(MainActivity.this, "100% XUẤT SẮC", Toast.LENGTH_LONG).show();
-//            } else if (spaceCount(score) == 1 && score.contains(compareWord)) {
-//                Toast.makeText(MainActivity.this, "80% TỐT", Toast.LENGTH_LONG).show();
-//            } else if (spaceCount(score) == 2 && score.contains(compareWord)) {
-//                Toast.makeText(MainActivity.this, "60% TẠM ỔN", Toast.LENGTH_LONG).show();
-//            } else if (spaceCount(score) == 3 && score.contains(compareWord)) {
-//                Toast.makeText(MainActivity.this, "50% CẦN LUYỆN TẬP THÊM", Toast.LENGTH_LONG).show();
-//            } else if (spaceCount(score) == 4 && score.contains(compareWord)) {
-//                Toast.makeText(MainActivity.this, "40% HÃY XEM LẠI PHÁT ÂM", Toast.LENGTH_LONG).show();
-//            } else if (score.contains(compareWord) == false) {
-//                Toast.makeText(MainActivity.this, "CHƯA ĐẠT HÃY XEM LẠI PHÁT ÂM", Toast.LENGTH_LONG).show();
-//            }
-
+            else if(text_result.contains(compareWord) && text_result.size()==2)
+            {
+                Toast.makeText(MainActivity.this, "80% TỐT", Toast.LENGTH_LONG).show();
+            }
+            else if(text_result.contains(compareWord) && text_result.size()==3)
+            {
+                Toast.makeText(MainActivity.this, "70% TẠM ỔN", Toast.LENGTH_LONG).show();
+            }
+            else if(text_result.contains(compareWord) && text_result.size()==4)
+            {
+                Toast.makeText(MainActivity.this, "50% HÃY LUYỆN TẬP THÊM", Toast.LENGTH_LONG).show();
+            }
+            else if(text_result.contains(compareWord) && text_result.size()==5)
+            {
+                Toast.makeText(MainActivity.this, "HÃY XEM LẠI CÁCH PHÁT ÂM PHÍA TRÊN", Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                Toast.makeText(MainActivity.this, "HÃY XEM LẠI CÁCH PHÁT ÂM PHÍA TRÊN", Toast.LENGTH_LONG).show();
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
