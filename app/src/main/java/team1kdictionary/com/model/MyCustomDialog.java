@@ -127,7 +127,7 @@ public class MyCustomDialog extends Dialog {
             }
         });
     }
-    int result;
+    //cái này mới đúng nè :v
     private void hienThiThemVaoFolder() {
         AlertDialog.Builder b = new AlertDialog.Builder(context);
         b.setTitle("Chọn Folder:");
