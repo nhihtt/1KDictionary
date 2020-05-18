@@ -94,13 +94,11 @@ public class MyCustomDialog extends Dialog {
                         null);
             }
         });
-
+//sửa ở đây
         imgFolder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //   Dialog folderDialog = new FolderCustomDialog(context);
-                //  folderDialog.show();
-                hienThiThemVaoFolder();
+                        hienThiThemVaoFolder();
 
             }
         });
