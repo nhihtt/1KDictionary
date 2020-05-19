@@ -185,10 +185,9 @@ public class MyCustomDialog extends Dialog {
                 // itemsWWordList là List<Word> lưu toàn bộ từ trong database
                 // itemSelected là kiểu Word
                 itemSelected = listItem.get(position);
-
-                final String word = itemSelected.getEng();
                 WID=itemSelected.getIdword();
-                String word = itemSelected.getEng();
+                final String word = itemSelected.getEng();
+
                 String mean = itemSelected.getMeaning();
 
                 TextView tvWord = myDialog.findViewById(R.id.tvWord);
