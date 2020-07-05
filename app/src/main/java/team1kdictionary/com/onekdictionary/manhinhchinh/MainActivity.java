@@ -2,16 +2,28 @@ package team1kdictionary.com.onekdictionary.manhinhchinh;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.ActivityNotFoundException;
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,7 +33,12 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.TextBlock;
+import com.google.android.gms.vision.text.TextRecognizer;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 
 import java.io.File;
@@ -63,6 +80,17 @@ public class MainActivity extends AppCompatActivity {
     public static String SPEECH_TO_TEXT = "";
     public static Intent speechIntent;
     private static SearchView searchView;
+
+    //Image function
+    private static final int CAMERA_REQUEST_CODE=200;
+    private static final int STORAGE_REQUEST_CODE=400;
+    private static final int IMAGE_PICK_GALLERY_CODE=1000;
+    private static final int IMAGE_PICK_CAMERA_CODE=1001;
+    private static String IMAGE_TO_TEXT="";
+    String cameraPermission[];
+    String storagePermission[];
+    Uri image_uri;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,55 +106,11 @@ public class MainActivity extends AppCompatActivity {
         try {
             displayWordList();
             voiceRecognization();
-//            translateParagraph();
-            checkPronounce();
         } catch (Exception ex) {
             Toast.makeText(this, "Error " + ex.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
-//    private void translateParagraph() {
-//        binding.btnTranslate.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                String translationString = binding.edtParagraph.getText().toString();
-//                try {
-//                    Http.post(translationString, "en", "es", new JsonHttpResponseHandler()
-//                    {
-//                        @Override
-//                        public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-//                            try {
-//                                JSONObject serverResp = new JSONObject(response.toString());
-//                                JSONObject jsonObject = serverResp.getJSONObject("data");
-//                                JSONArray transObject = jsonObject.getJSONArray("translations");
-//                                JSONObject transObject2 =  transObject.getJSONObject(0);
-//                                binding.edtResult.setText(transObject2.getString("translatedText"));
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
-//                        };
-//                    });
-//                } catch (UnsupportedEncodingException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//    }
-
-
-//    private void googleTextTranslate() {
-//        FirebaseTranslatorOptions options =
-//                new FirebaseTranslatorOptions.Builder()
-//                        .setSourceLanguage(FirebaseTranslateLanguage.EN)
-//                        .setTargetLanguage(FirebaseTranslateLanguage.VI)
-//                        .build();
-//        final FirebaseTranslator englishVietNamTranslator =
-//                FirebaseNaturalLanguage.getInstance().getTranslator(options);
-//    }
-
-    private void checkPronounce() {
-
-    }
 
     private void voiceRecognization() {
         speechIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -134,8 +118,6 @@ public class MainActivity extends AppCompatActivity {
         speechIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Đang lắng nghe...");
         speechIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
     }
-
-
 
 
     @Override
@@ -146,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
             searchView.setFocusable(true);
             searchView.setIconified(false);
             searchView.requestFocusFromTouch();
-            searchView.setQuery(SPEECH_TO_TEXT, false);
+            searchView.setQuery(SPEECH_TO_TEXT, true);
             tempList.clear();
             for (int i = 0; i < itemsWordList.size(); i++) {
                 if (itemsWordList.get(i).getEng().startsWith(SPEECH_TO_TEXT)) {
@@ -163,8 +145,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         }
-        if (requestCode == 113 && resultCode == RESULT_OK && data != null)
-        {
+        if (requestCode == 113 && resultCode == RESULT_OK && data != null) {
             for (int i = 0; i < itemsWordList.size(); i++) {
                 if (itemsWordList.get(i).getEng().startsWith(SPEECH_TO_TEXT)) {
                     tempList.add(itemsWordList.get(i));
@@ -204,6 +185,66 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "HÃY XEM LẠI CÁCH PHÁT ÂM PHÍA TRÊN", Toast.LENGTH_LONG).show();
             }
         }
+        if(resultCode == RESULT_OK && requestCode == IMAGE_PICK_GALLERY_CODE){
+            //got image from gallery now crop it
+            CropImage.activity(data.getData())
+                    .setGuidelines(CropImageView.Guidelines.ON) //enable image guidline
+                    .start(this);
+        }
+        if(resultCode == RESULT_OK && requestCode == IMAGE_PICK_CAMERA_CODE){
+            //got iamge from camera now crop it
+            CropImage.activity(image_uri)
+                    .setGuidelines(CropImageView.Guidelines.ON) //enable image guidline
+                    .start(this);
+        }
+        //get cropped image
+        if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE)
+        {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if(resultCode== RESULT_OK){
+                Uri resultUri = result.getUri();
+                //set image to ImageView
+                binding.imgPick.setImageURI(resultUri);
+                //get drawable bitmap for text recognization
+                BitmapDrawable bitmapDrawable= (BitmapDrawable) binding.imgPick.getDrawable();
+                Bitmap bitmap = bitmapDrawable.getBitmap();
+
+                TextRecognizer textRecognizer= new TextRecognizer.Builder(getApplicationContext()).build();
+                if(!textRecognizer.isOperational()){
+                    Toast.makeText(this, "ERROR", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    Frame frame = new Frame.Builder().setBitmap(bitmap).build();
+                    SparseArray<TextBlock> items = textRecognizer.detect(frame);
+                    StringBuilder sb = new StringBuilder();
+                    //get text from sb until there is no text
+                    for(int i=0; i<items.size();i++)
+                    {
+                        TextBlock myItem = items.valueAt(i);
+                        sb.append(myItem.getValue());
+                        sb.append("\n");
+                    }
+                    //set text to IMAGE_TO_TEXT
+                    IMAGE_TO_TEXT = sb.toString().trim();
+                    searchView.setFocusable(true);
+                    searchView.setIconified(false);
+                    searchView.requestFocusFromTouch();
+                    searchView.setQuery(IMAGE_TO_TEXT, true);
+                    tempList.clear();
+                    for (int i = 0; i < itemsWordList.size(); i++) {
+                        if (itemsWordList.get(i).getEng().startsWith(IMAGE_TO_TEXT)) {
+                            tempList.add(itemsWordList.get(i));
+                        }
+                    }
+                    gvDic.deferNotifyDataSetChanged();
+                    MyCustomDialog.setWordForDialog(tempList, gvDic, MainActivity.this, myDialog);
+                }
+            }
+            else if(resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE){
+                Exception error = result.getError();
+                Toast.makeText(this, "ERROR: "+error, Toast.LENGTH_SHORT).show();
+            }
+        }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -237,6 +278,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addControls() {
+        cameraPermission = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        storagePermission = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
         gvDic = findViewById(R.id.gvDic);
         allWordAdapter = new WordAdapter(MainActivity.this, R.layout.word_item, itemsWordList);
         gvDic.setAdapter(allWordAdapter);
@@ -290,6 +333,10 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.mnsearch) {
             return true;
         }
+        if(id == R.id.mnImg)
+        {
+            showImageImportDialog();
+        }
         if (id == R.id.mnvoice) {
             try {
                 startActivityForResult(speechIntent, RECOGNIZER_RESULT);
@@ -302,6 +349,124 @@ public class MainActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    private void showImageImportDialog() {
+        // item to display dialog
+        String[] items= {" Camera", " Gallery"};
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        // set title
+        dialog.setTitle("Select Image");
+        dialog.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(which == 0)
+                {
+                    if(!checkCameraPermission())
+                    {
+                        // Camera permission was not allow, Request it
+                        requestCameraPermission();
+                    }
+                    else
+                    {
+                        // Permission allow, take pic
+                        pickCamera();
+                    }
+                }
+                if(which == 1)
+                {
+                    // Gallery options clicked
+                    if(!checkStoragePermission())
+                    {
+                        // Storage permission was not allow, Request it
+                        requestStoragePermission();
+                    }
+                    else
+                    {
+                        // Permission allow, take pic
+                        pickGallery();
+                    }
+                }
+            }
+        });
+        dialog.create().show(); // show dialog
+
+    }
+
+    private void pickGallery() {
+        // intent to take image from gallery
+        Intent galleryIntent= new Intent(Intent.ACTION_PICK);
+        galleryIntent.setType("image/*");
+        startActivityForResult(galleryIntent, IMAGE_PICK_GALLERY_CODE);
+
+    }
+
+    private void pickCamera() {
+        // intent to take image from camera, it also save in storage to get high quality image
+        ContentValues values= new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE, "New Pic"); // title of the picture
+        values.put(MediaStore.Images.Media.DESCRIPTION, "Image To Text");
+        image_uri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, image_uri);
+        startActivityForResult(cameraIntent, IMAGE_PICK_CAMERA_CODE);
+    }
+
+    private void requestStoragePermission() {
+        ActivityCompat.requestPermissions(this, storagePermission, STORAGE_REQUEST_CODE);
+    }
+
+    private boolean checkStoragePermission() {
+        boolean result = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == (PackageManager.PERMISSION_GRANTED);
+        return result;
+    }
+
+    private void requestCameraPermission() {
+        ActivityCompat.requestPermissions(this, cameraPermission, CAMERA_REQUEST_CODE);
+    }
+
+    private boolean checkCameraPermission() {
+        boolean result = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA) == (PackageManager.PERMISSION_GRANTED);
+        boolean result1 = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) == (PackageManager.PERMISSION_GRANTED);
+        return result && result1;
+    }
+
+    //handle permission result
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode)
+        {
+            case CAMERA_REQUEST_CODE:
+                if(grantResults.length > 0){
+                    boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    boolean writeStorageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    if(cameraAccepted && writeStorageAccepted){
+                        pickCamera();
+                    }
+                    else{
+                        Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                break;
+            case STORAGE_REQUEST_CODE:
+                if(grantResults.length > 0){
+                    boolean writeStorageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                    if(writeStorageAccepted){
+                        pickGallery();
+                    }
+                    else{
+                        Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                break;
+        }
+    }
+
+    //handle image request
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
