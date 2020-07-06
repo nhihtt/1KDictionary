@@ -2,12 +2,18 @@ package team1kdictionary.com.onekdictionary.manhinhchinh;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import adapter.SettingAdapter;
 import team1kdictionary.com.model.Settings;
@@ -18,23 +24,50 @@ public class SettingActivity extends AppCompatActivity {
 
     ActivitySettingBinding binding;
     SettingAdapter settingAdapter;
+    public static List<Settings> arrSettings=new ArrayList<>();
+    int modeType;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivitySettingBinding.inflate(getLayoutInflater());
+
         setContentView(binding.getRoot());
+        getMode();
         changeActivity();
-        settingAdapter = new SettingAdapter(SettingActivity.this, R.layout.item_settings);
-        binding.lvSettings.setAdapter(settingAdapter);
-        addSettingData();
+        settingAdapter = new SettingAdapter(SettingActivity.this, R.layout.item_settings, arrSettings);
+
+
+        addEvents();
     }
 
-    private void addSettingData() {
-        String[] arrSetting={"Nhắc nhở học từ vựng", "Chuyển sang giao diện DarkMode", "Báo lỗi", "Thông tin phiên bản"};
-        settingAdapter.add(new Settings(R.drawable.img_alarm, "Nhắc nhở từ vựng"));
-        settingAdapter.add(new Settings(R.drawable.img_darkmode, "Chuyển sang giao diện DarkMode"));
-        settingAdapter.add(new Settings(R.drawable.img_messages, "Báo lỗi"));
-        settingAdapter.add(new Settings(R.drawable.img_info, "Thông tin phiên bản"));
+    private void getMode() {
+
+        modeType = AppCompatDelegate.getDefaultNightMode();
+
+
+         if (modeType == AppCompatDelegate.MODE_NIGHT_YES) {
+           binding.btnDarkmode.setText("Chuyển sang chế độ ban ngày");
+        } else if (modeType == AppCompatDelegate.MODE_NIGHT_NO) {
+             binding.btnDarkmode.setText("Chuyển sang chế độ ban đêm");
+        }
+    }
+
+
+    private void addEvents() {
+
+        binding.btnDarkmode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (binding.btnDarkmode.getText()=="Chuyển sang chế độ ban đêm"){
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    binding.btnDarkmode.setText("Chuyển sang chế độ ban ngày");
+                }
+                else{
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    binding.btnDarkmode.setText("Chuyển sang chế độ ban đêm");
+                }
+            }
+        });
     }
 
     private void changeActivity() {
