@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 
 import team1kdictionary.com.model.Word;
-import team1kdictionary.com.onekdictionary.R;
 import team1kdictionary.com.onekdictionary.databinding.ActivityQuizBinding;
 
 public class QuizActivity extends AppCompatActivity {
@@ -33,7 +32,7 @@ public class QuizActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding=ActivityQuizBinding.inflate(getLayoutInflater());
+        binding= ActivityQuizBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         layDuLieu();
       //  addWords();
@@ -68,7 +67,7 @@ public class QuizActivity extends AppCompatActivity {
                     hienThiDuLieu();
                 }
                 else{
-                    Intent intent= new Intent(QuizActivity.this,KetQuaActivity.class);
+                    Intent intent= new Intent(QuizActivity.this, KetQuaActivity.class);
                     intent.putExtra("FolderName",binding.txtFolderName.getText().toString());
                     intent.putExtra("Score",score);
                     startActivity(intent);
@@ -81,7 +80,7 @@ public class QuizActivity extends AppCompatActivity {
     private void hienThiDuLieu() {
         binding.txtScore.setText("Score: "+score.toString());
         binding.txtQuestionCount.setText("Câu hỏi: "+(viTriTuHienTai+1)+"/"+soTu);
-        binding.txtQuestion.setText(listWordStudying.get(viTriTuHienTai).getMeaning());
+        binding.txtQuestion.setText(listWordStudying.get(viTriTuHienTai).toString());
 
     }
 
@@ -98,6 +97,7 @@ public class QuizActivity extends AppCompatActivity {
         Cursor c = database.rawQuery(query, null);
         while (c.moveToNext()) {
             String WID=c.getString(0);
+
             listWID.add(WID);
         }
         c.close();
@@ -108,10 +108,12 @@ public class QuizActivity extends AppCompatActivity {
             query="Select * From data Where _id = "+id;
             c=database.rawQuery(query, null);
             while (c.moveToNext()) {
-                Word w = new Word();
+                String word=c.getString(1);
+                Word w = new Word(id, word, null, null, null,null);
                 w.setIdword(c.getInt(0));
                 w.setEng(c.getString(1));
-                w.setMeaning(c.getString(2));
+                w.setRawMean(c.getString(2));
+                w.setMeanAndPronounce();
                 temp.add(w);
             }
             c.close();

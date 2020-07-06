@@ -1,4 +1,4 @@
-package adapter;
+package team1kdictionary.com.model;
 
 public class Relationship {
     private String WID;

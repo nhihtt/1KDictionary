@@ -1,9 +1,5 @@
 package team1kdictionary.com.onekdictionary.manhinhchinh;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,6 +13,10 @@ import android.view.MenuItem;
 import android.widget.GridView;
 import android.widget.SearchView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -27,7 +27,6 @@ import team1kdictionary.com.model.MyCustomDialog;
 import team1kdictionary.com.model.Word;
 import team1kdictionary.com.onekdictionary.R;
 import team1kdictionary.com.onekdictionary.databinding.ActivityHistoryBinding;
-
 
 import static team1kdictionary.com.onekdictionary.manhinhchinh.MainActivity.tuDaTimKiem;
 
@@ -106,7 +105,8 @@ public class HistoryActivity extends AppCompatActivity {
             String word = c.getString(1);
             String mean = c.getString(2);
 
-            Word vocabulary = new Word(id,word, null, null, mean,null);
+            Word vocabulary = new Word(id,word, null, mean, null,null);
+            vocabulary.setMeanAndPronounce();
             itemsWordListHistory.add(vocabulary);
       //           allWordAdapter.add(vocabulary);
 

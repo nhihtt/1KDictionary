@@ -1,12 +1,11 @@
 package team1kdictionary.com.onekdictionary.luyentap;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import team1kdictionary.com.onekdictionary.R;
+import androidx.appcompat.app.AppCompatActivity;
+
 import team1kdictionary.com.onekdictionary.databinding.ActivityKetQuaBinding;
 import team1kdictionary.com.onekdictionary.manhinhchinh.MainActivity;
 
@@ -15,7 +14,7 @@ public class KetQuaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding=ActivityKetQuaBinding.inflate(getLayoutInflater());
+        binding= ActivityKetQuaBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         layDuLieu();
         addEvents();

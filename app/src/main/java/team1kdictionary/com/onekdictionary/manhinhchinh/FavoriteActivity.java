@@ -1,44 +1,32 @@
 package team1kdictionary.com.onekdictionary.manhinhchinh;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import adapter.FolderAdapter;
-import adapter.WordAdapter;
-import team1kdictionary.com.model.Word;
 import team1kdictionary.com.model.WordFolder;
 import team1kdictionary.com.onekdictionary.R;
 import team1kdictionary.com.onekdictionary.databinding.ActivityFavoriteBinding;
+import team1kdictionary.com.onekdictionary.hienthitu.HienThiTuActivity;
 import team1kdictionary.com.onekdictionary.luyentap.FlashCardActivity;
 import team1kdictionary.com.onekdictionary.luyentap.LuyenTapActivity;
-import team1kdictionary.com.onekdictionary.manhinhchinh.HistoryActivity;
-import team1kdictionary.com.onekdictionary.manhinhchinh.MainActivity;
-import team1kdictionary.com.onekdictionary.manhinhchinh.SettingActivity;
 
 public class FavoriteActivity extends AppCompatActivity {
 
@@ -46,6 +34,7 @@ public class FavoriteActivity extends AppCompatActivity {
     String DB_PATH_SUFFIX="/databases/";
     String newID;
     String newName;
+    String newFolderName;
     SQLiteDatabase database=null;
     FolderAdapter folderAdapter;
     WordFolder selectedFolder;
@@ -60,9 +49,7 @@ public class FavoriteActivity extends AppCompatActivity {
         addControls();
         displayFolderList();
         addEvents();
-
-
-        }
+    }
 
 
 
@@ -98,9 +85,57 @@ public class FavoriteActivity extends AppCompatActivity {
                 }
             }
         });
+        binding.btnViewWord.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(FavoriteActivity.this, HienThiTuActivity.class);
+                intent.putExtra("FID",selectedFolder.getId());
+                startActivity(intent);
+            }
+        });
+        binding.imgbtnRename.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(selectedFolder==null)
+                {
+                    Toast.makeText(FavoriteActivity.this,"Mời bạn chọn folder cần đổi",Toast.LENGTH_LONG).show();
+                }
+                else {
+                   hienThiDoiTen();
+                }
+            }
+        });
 
 
+    }
 
+    private void hienThiDoiTen() {
+        final Dialog dialog = new Dialog(FavoriteActivity.this);
+        dialog.setContentView(R.layout.rename_folder_item);
+        final EditText edtNewName=(EditText) dialog.findViewById(R.id.edtNewName);
+        Button btnRename=dialog.findViewById(R.id.btnRename);
+        btnRename.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                newFolderName=edtNewName.getText().toString();
+                updateName();
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+
+    }
+
+    private void updateName() {
+        ContentValues values=new ContentValues();
+        values.put("name",newFolderName);
+        int result=database.update("folder",values,"id=?",new String[] {selectedFolder.getId()});
+        if (result>0)
+        {
+            Toast.makeText(FavoriteActivity.this,"Đổi tên folder thành công",Toast.LENGTH_SHORT).show();
+            selectedFolder.setName(newFolderName);
+            binding.lvWordFile.setAdapter(folderAdapter);
+        }
     }
 
 
@@ -157,15 +192,26 @@ public class FavoriteActivity extends AppCompatActivity {
     }
 
     private void displayFolderList() {
+        folderAdapter.clear();
         database = openOrCreateDatabase(DATABASE, MODE_PRIVATE, null);
         Cursor c = database.rawQuery("Select * From folder", null);
         while (c.moveToNext()) {
             String id=c.getString(0);
             String name = c.getString(1);
-            WordFolder folder = new WordFolder(id,name);
+            int soTu=0;
+            Cursor d=database.rawQuery("Select * From relationships",null);
+            while (d.moveToNext())
+            {
+                String str=d.getString(1);
+                if(str!=null&&str.compareTo(id)==0)
+                    soTu++;
+            }
+            d.close();
+            WordFolder folder = new WordFolder(id,name,soTu);
             folderAdapter.add(folder);
         }
         c.close();
+        binding.lvWordFile.setAdapter(folderAdapter);
     }
 
     @Override
@@ -199,7 +245,7 @@ public class FavoriteActivity extends AppCompatActivity {
                 newID = "fd" + (folderAdapter.getCount());
                 newName=edtNewFolderName.getText().toString();
                 WordFolder newFolder = new WordFolder();
-                WordAdapter newWordAdapter = new WordAdapter();
+              //  WordAdapter newWordAdapter = new WordAdapter();
                 newFolder.setName(newName);
                 newFolder.setId(newID);
                 if(addFolder()!=0) {
@@ -218,7 +264,7 @@ public class FavoriteActivity extends AppCompatActivity {
         });
         dialog.show();
     }
-
+//ád
     private int addFolder() {
         ContentValues values=new ContentValues();
         values.put("id",newID);

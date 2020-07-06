@@ -4,60 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".hienthitu.HienThiTuActivity"
-
     android:layout_margin="10dp"
-    android:background="@drawable/shapeword"
-    android:elevation="3dp"
+
     android:orientation="vertical"
-    android:paddingHorizontal="10dp"
-    android:paddingVertical="10dp">
-    <LinearLayout
+    tools:context=".hienthitu.HienThiTuActivity">
+
+    <GridView
+        android:id="@+id/gvShowWords"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:clipChildren="false"
+        android:horizontalSpacing="15dp"
+        android:numColumns="2"
+        android:verticalSpacing="15dp"
+        tools:layout_editor_absoluteX="5dp"
+        tools:layout_editor_absoluteY="5dp" />
 
-        <TextView
-            android:id="@+id/tvWord"
-            android:layout_width="120dp"
-            android:layout_height="50dp"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="TextView"
-            android:textColor="@color/colorYellowDark"
-            android:textSize="22dp"
-            android:textStyle="bold" />
-
-        <ImageView
-            android:id="@+id/imgLove"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:foregroundGravity="bottom|center|right"
-            android:scrollbarSize="4dp"
-            app:srcCompat="@drawable/love"
-            tools:srcCompat="@drawable/love" />
-    </LinearLayout>
-    <!--    <LinearLayout-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent">-->
-
-    <!--        <TextView-->
-    <!--            android:id="@+id/txtInfo"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_weight="1"-->
-    <!--            android:text="TextView" />-->
-    <!--    </LinearLayout>-->
-
-
-    <TextView
-        android:id="@+id/txtMean"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:ellipsize="end"
-        android:maxLines="4"
-        android:text="TextView"
-        android:textColor="@android:color/darker_gray"
-        android:textSize="16sp"
-        android:textStyle="bold" />
 </LinearLayout>

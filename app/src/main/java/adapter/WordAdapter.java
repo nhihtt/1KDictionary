@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,10 +23,14 @@ public class WordAdapter extends BaseAdapter implements Filterable {
     private List<Word> itemsWordList;
     private List<Word> itemsWordListFilter;
 
-    public WordAdapter() {
-    }
 
-    public WordAdapter(@NonNull Activity context, int resource, List<Word> itemsWordList) {
+    public WordAdapter(@NonNull Activity context, int resource) {
+
+ //       super(context, resource);
+        this.context=context;
+        this.resource=resource;
+    }
+    public WordAdapter(Activity context, int resource, List<Word> itemsWordList) {
         this.context=context;
         this.resource=resource;
         this.itemsWordList = itemsWordList;
@@ -52,15 +55,18 @@ public class WordAdapter extends BaseAdapter implements Filterable {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = context.getLayoutInflater().inflate(R.layout.word_item, null);
-
-
-        ImageView imgLove = view.findViewById(R.id.imgLove);
         TextView txtWord = view.findViewById(R.id.tvWord);
         TextView txtMean = view.findViewById(R.id.txtMean);
-        imgLove.setImageResource(itemsWordListFilter.get(position).getIsFavorite());
+        TextView txtPronounce=view.findViewById(R.id.txtPronounce);
         txtWord.setText(itemsWordListFilter.get(position).getEng());
-        txtMean.setText(itemsWordListFilter.get(position).getMeaning());
-
+        String mean="";
+        mean+=/*itemsWordList.get(position).getNghia().get(0).toString()*/ itemsWordList.get(position).toString();
+        txtMean.setText(mean);
+        String pronounce="";
+        if(itemsWordListFilter.get(position).getPronounce()!="" && itemsWordListFilter.get(position).getPronounce()!=null) {
+           pronounce = itemsWordListFilter.get(position).getPronounce() ;
+        }
+        txtPronounce.setText(pronounce);
         return view;
     }
 

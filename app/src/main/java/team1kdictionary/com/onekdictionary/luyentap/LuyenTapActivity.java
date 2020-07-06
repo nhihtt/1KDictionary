@@ -18,7 +18,7 @@ String folderName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding=ActivityLuyenTapBinding.inflate(getLayoutInflater());
+        binding= ActivityLuyenTapBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         layDuLieu();
         addEvents();
@@ -36,7 +36,7 @@ String folderName;
     }
 
     private void startQuiz() {
-        Intent intent= new Intent(LuyenTapActivity.this,QuizActivity.class);
+        Intent intent= new Intent(LuyenTapActivity.this, QuizActivity.class);
         intent.putExtra("FID",FID);
         intent.putExtra("FolderName",folderName);
         startActivity(intent);

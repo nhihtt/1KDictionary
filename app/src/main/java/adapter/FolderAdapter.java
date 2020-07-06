@@ -40,7 +40,10 @@ public class FolderAdapter extends ArrayAdapter<WordFolder> {
             }
         }); */
         txtFolderName.setText(folder.getName());
-      //  txtNowStudy.setText(folder.getName());
+        TextView txtSoTu=view.findViewById(R.id.txtAmount);
+        txtSoTu.setText("Số từ : "+folder.getSoTu());
+
+       // txtNowStudy.setText(folder.getName());
         return view;
     }
 

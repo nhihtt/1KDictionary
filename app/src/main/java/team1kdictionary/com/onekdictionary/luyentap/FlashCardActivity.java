@@ -12,12 +12,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import team1kdictionary.com.model.Word;
 import team1kdictionary.com.onekdictionary.R;
 import team1kdictionary.com.onekdictionary.databinding.ActivityFlashCardBinding;
-import team1kdictionary.com.onekdictionary.manhinhchinh.FavoriteActivity;
 
 public class FlashCardActivity extends AppCompatActivity {
     ActivityFlashCardBinding binding;
@@ -38,7 +36,7 @@ public class FlashCardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding=ActivityFlashCardBinding.inflate(getLayoutInflater());
+        binding= ActivityFlashCardBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         layDuLieu();
         addControls();
@@ -50,7 +48,7 @@ public class FlashCardActivity extends AppCompatActivity {
         if(listWordStudying.size()!=0){
             binding.txtSoTu.setText(viTriTuHienTai+1+"/"+soTu);
         binding.txtFront.setText(listWordStudying.get(viTriTuHienTai).getEng());
-        binding.txtBack.setText(listWordStudying.get(viTriTuHienTai).getMeaning());
+        binding.txtBack.setText(listWordStudying.get(viTriTuHienTai).toString());
         }
     }
 
@@ -187,10 +185,11 @@ public class FlashCardActivity extends AppCompatActivity {
             query="Select * From data Where _id = "+id;
             c=database.rawQuery(query, null);
             while (c.moveToNext()) {
-                Word w = new Word();
+                Word w = new Word(id, null, null, null, null,null);
                 w.setIdword(c.getInt(0));
                 w.setEng(c.getString(1));
-                w.setMeaning(c.getString(2));
+                w.setRawMean(c.getString(2));
+                w.setMeanAndPronounce();
 
                 a.add(w);
             }

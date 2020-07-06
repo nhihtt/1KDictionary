@@ -1,12 +1,17 @@
 package team1kdictionary.com.model;
 
-import adapter.WordAdapter;
-
 public class WordFolder {
     private String id;
     private String name;
+    private int soTu;
 
+    public int getSoTu() {
+        return soTu;
+    }
 
+    public void setSoTu(int soTu) {
+        this.soTu = soTu;
+    }
 
     public String getId() {
         return id;
@@ -19,10 +24,10 @@ public class WordFolder {
     public WordFolder() {
     }
 
-    public WordFolder(String id, String name) {
+    public WordFolder(String id, String name, int soTu) {
         this.id = id;
         this.name = name;
-
+        this.soTu=soTu;
     }
 
     public String getName() {

@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,18 +17,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import adapter.Relationship;
 import team1kdictionary.com.onekdictionary.R;
 import team1kdictionary.com.onekdictionary.manhinhchinh.MainActivity;
 
-import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
 import static team1kdictionary.com.onekdictionary.manhinhchinh.MainActivity.itemSelected;
 
@@ -129,7 +125,7 @@ public class MyCustomDialog extends Dialog {
     private void hienThiThemVaoFolder() {
         AlertDialog.Builder b = new AlertDialog.Builder(context);
         b.setTitle("Chọn Folder:");
-        b.setMultiChoiceItems(str, null,new DialogInterface.OnMultiChoiceClickListener(){
+        b.setMultiChoiceItems(str, null,new OnMultiChoiceClickListener(){
             @Override
             public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                 //Nếu người dùng chọn
@@ -143,7 +139,9 @@ public class MyCustomDialog extends Dialog {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String wid=WID+"";
-                database.delete("relationships","WID=?",new String[]{wid});
+                int a=database.delete("relationships","WID=?",new String[]{wid});
+                if(a==0){
+                Toast.makeText(context,wid,Toast.LENGTH_LONG).show();}
                 if(selectedFoldersID.size()!=0)
                 {
                     for (int i=0;i<selectedFoldersID.size();i++) {
@@ -164,7 +162,9 @@ public class MyCustomDialog extends Dialog {
         while (c.moveToNext()) {
             String id=c.getString(0);
             String name = c.getString(1);
-            WordFolder folder = new WordFolder(id,name);
+            WordFolder folder = new WordFolder();
+            folder.setName(name);
+            folder.setId(id);
             lstFolder.add(folder);
         }
         c.close();
@@ -188,7 +188,7 @@ public class MyCustomDialog extends Dialog {
                 WID=itemSelected.getIdword();
                 final String word = itemSelected.getEng();
 
-                String mean = itemSelected.getMeaning();
+                String mean =itemSelected.getPronounce()+"\n"+itemSelected.toString();
 
                 TextView tvWord = myDialog.findViewById(R.id.tvWord);
                 TextView tvInfo = myDialog.findViewById(R.id.tvInfo);
