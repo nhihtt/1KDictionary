@@ -22,7 +22,7 @@ public class FolderAdapter extends ArrayAdapter<WordFolder> {
         this.context=context;
         this.resource=resource;
     }
-//change
+
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         final View view = this.context.getLayoutInflater().inflate(this.resource, null);
         final WordFolder folder = getItem(position);
