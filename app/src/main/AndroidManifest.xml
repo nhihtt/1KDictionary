@@ -3,6 +3,11 @@
     package="team1kdictionary.com.onekdictionary">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!--Camera and storage permission-->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -12,7 +17,7 @@
         android:theme="@style/AppTheme">
         <activity android:name=".luyentap.KetQuaActivity"></activity>
         <activity android:name=".hienthitu.HienThiTuActivity" />
-        <activity android:name=".manhinhchinh.SettingActivity" />
+        <activity android:name=".manhinhchinh.SettingActivity" android:configChanges="uiMode"/>
         <activity android:name=".manhinhchinh.HistoryActivity" />
         <activity android:name=".manhinhchinh.FavoriteActivity" />
         <activity android:name=".luyentap.FlashCardActivity" />
@@ -25,10 +30,15 @@
             android:theme="@style/SplashscreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <!--Add in application tag-->
+        <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/AppTheme"/> <!-- optional (needed if default theme has no action bar) -->
     </application>
+
+
 
 </manifest>

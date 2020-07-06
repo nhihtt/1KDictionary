@@ -6,12 +6,105 @@
     android:layout_height="match_parent"
     tools:context=".manhinhchinh.SettingActivity">
 
-    <ListView
-        android:id="@+id/lvSettings"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:divider="@null"
-        android:dividerHeight="0dp"/>
+        android:id="@+id/ln1"
+        >
+
+        <ImageView
+            android:id="@+id/imgDarkMode"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/img_darkmode"
+            android:textAlignment="center"
+            />
+
+        <Button
+            android:id="@+id/btnDarkmode"
+
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/custom_border"
+            android:fontFamily="@font/vidaloka"
+            android:text="Chuyển sang chế độ ban đêm"
+            android:textAlignment="viewStart"
+            android:textAllCaps="false"
+            android:textSize="20dp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ln2"
+        android:layout_below="@+id/ln1"
+       >
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/img_alarm" />
+
+        <Button
+            android:id="@+id/btnNhacNho"
+            android:fontFamily="@font/vidaloka"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:textSize="20dp"
+            android:background="@drawable/custom_border"
+            android:text="Nhắc nhở từ vựng"
+            android:textAlignment="viewStart"
+            android:textAllCaps="false" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ln3"
+        android:layout_below="@+id/ln2"
+        >
+
+        <ImageView
+            android:id="@+id/imageMessage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/img_messages" />
+
+        <Button
+            android:id="@+id/btnBaoLoi"
+            android:fontFamily="@font/vidaloka"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:textSize="20dp"
+            android:background="@drawable/custom_border"
+            android:text="Báo lỗi"
+            android:textAlignment="viewStart"
+            android:textAllCaps="false" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ln3"
+        >
+
+        <ImageView
+            android:id="@+id/imageinfor"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/img_info" />
+
+        <Button
+            android:id="@+id/btnInfo"
+            android:fontFamily="@font/vidaloka"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:textSize="20dp"
+            android:background="@drawable/custom_border"
+            android:text="Thông tin phiên bản"
+            android:textAlignment="viewStart"
+            android:textAllCaps="false" />
+    </LinearLayout>
+
+
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:layout_width="match_parent"
